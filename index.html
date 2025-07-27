@@ -105,22 +105,28 @@
       list-style-type: square;
       padding-left: 1.2rem;
     }
-    /* Progress Bars */
+    
     .progress-wrapper {
       margin-top: 1rem;
     }
 
     .progress-bar {
       background: #333;
-      border: 1px solid #555;
       border-radius: 5px;
       overflow: hidden;
       height: 20px;
       margin-bottom: 10px;
+      position: relative;
     }
 
     .progress-bar label {
       color: #eee;
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 0.9rem;
     }
 
     .progress {
@@ -132,10 +138,6 @@
 
     .progress.zero {
       background-color: transparent;
-    }
-
-    .progress:empty {
-      padding: 0;
     }
 
 
