@@ -13,38 +13,80 @@
       padding: 0;
       line-height: 1.6;
     }
+
     header {
-      background: #1a1a1a;
+      background: #d3d3d3;
       padding: 2rem;
       text-align: center;
+      color: #111;
+      position: relative;
     }
+
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
     }
+
     p.tagline {
       font-size: 1.2rem;
-      color: #aaa;
+      color: #333;
     }
+
+    nav.tabs {
+      display: flex;
+      justify-content: center;
+      background: #ccc;
+      border-top: 1px solid #aaa;
+      border-bottom: 1px solid #aaa;
+    }
+
+    nav.tabs button {
+      background: none;
+      border: none;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #111;
+      transition: background 0.2s;
+    }
+
+    nav.tabs button:hover {
+      background: #bbb;
+    }
+
+    nav.tabs button.active {
+      background: #00ff99;
+      color: #000;
+      font-weight: bold;
+    }
+
     main {
       max-width: 800px;
       margin: auto;
       padding: 2rem;
     }
+
     section {
-      margin-bottom: 2rem;
+      display: none;
     }
+
+    section.active {
+      display: block;
+    }
+
     h2 {
       border-bottom: 2px solid #444;
       padding-bottom: 0.5rem;
       color: #00ff99;
     }
+
     .project {
       background: #222;
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1rem;
     }
+
     footer {
       text-align: center;
       padding: 1rem;
@@ -52,6 +94,7 @@
       color: #777;
       border-top: 1px solid #333;
     }
+
     a {
       color: #00ffcc;
     }
@@ -61,32 +104,50 @@
   <header>
     <h1>SOEP's Unity AI Tools</h1>
     <p class="tagline">Enemy AI, NPC Systems, and Game Dev Utilities</p>
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="about">About Me</button>
+      <button class="tab-button" data-tab="projects">Projects</button>
+      <button class="tab-button" data-tab="contact">Contact</button>
+    </nav>
   </header>
 
   <main>
-    <section>
+    <section id="about" class="active">
       <h2>About Me</h2>
       <p>I build tools and systems for Unity focused on AI—such as Enemy AI Toolkits and NPC behavior systems. My goal is to help developers make smarter and more interactive games.</p>
     </section>
 
-    <section>
+    <section id="projects">
       <h2>Projects</h2>
       <div class="project">
         <strong>Enemy AI Toolkit</strong>
         <p>Customizable enemy AI with patrol, chase, and field of view systems. Built for expandability and performance.</p>
         <p><em>Soon available on the Unity Asset Store.</em></p>
       </div>
-      <!-- Add more project blocks as you build more -->
     </section>
 
-    <section>
+    <section id="contact">
       <h2>Contact</h2>
       <p>Email: <a href="mailto:SOEP.Unity@gmail.com">SOEP.Unity@gmail.com</a></p>
     </section>
   </main>
 
-  <footer>
-    <p>This site is a work-in-progress. I’ll keep improving it when I have more time.</p>
-  </footer>
+  <script>
+    const tabs = document.querySelectorAll('.tab-button');
+    const sections = document.querySelectorAll('main section');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Toggle active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Show correct section
+        sections.forEach(sec => sec.classList.remove('active'));
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
+
