@@ -19,7 +19,6 @@
       padding: 2rem;
       text-align: center;
       color: #eee;
-      position: relative;
     }
 
     h1 {
@@ -40,9 +39,6 @@
       border-top: 1px solid #333;
       border-bottom: 1px solid #333;
       margin: 0;
-      position: relative;
-      top: 0;
-      z-index: 10;
     }
 
     nav.tabs button {
@@ -110,12 +106,14 @@
   <header>
     <h1>SOEP's Unity AI Tools</h1>
     <p class="tagline">Enemy AI, NPC Systems, and Game Dev Utilities</p>
-    <nav class="tabs">
-      <button class="tab-button active" data-tab="about">About Me</button>
-      <button class="tab-button" data-tab="projects">Projects</button>
-      <button class="tab-button" data-tab="contact">Contact</button>
-    </nav>
   </header>
+
+  <!-- Tabs right between header and main -->
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="about">About Me</button>
+    <button class="tab-button" data-tab="projects">Projects</button>
+    <button class="tab-button" data-tab="contact">Contact</button>
+  </nav>
 
   <main>
     <section id="about" class="active">
@@ -144,11 +142,9 @@
 
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        // Toggle active tab
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
-        // Show correct section
         sections.forEach(sec => sec.classList.remove('active'));
         document.getElementById(tab.dataset.tab).classList.add('active');
       });
@@ -156,5 +152,3 @@
   </script>
 </body>
 </html>
-
-
