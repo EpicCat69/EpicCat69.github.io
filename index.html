@@ -125,11 +125,21 @@
       background: #00ff99;
       color: #000;
       text-align: center;
-      padding: 0.3rem;
       font-weight: bold;
-      transition: width 0.6s ease;
       white-space: nowrap;
       overflow: hidden;
+      transition: width 0.6s ease;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      min-width: 0;
+    }
+
+    .progress.zero {
+      width: 0 !important;
+      background: none;
+      padding: 0;
+      height: 0;
+      line-height: 0;
     }
 
     .progress:empty {
@@ -216,7 +226,7 @@
 
         <label>NPC AI Toolkit</label>
         <div class="progress-bar">
-          <div class="progress" style="width: 0%;">0%</div>
+          <div class="progress zero" style="width: 0%;"></div>
         </div>
       </div>
     </section>
