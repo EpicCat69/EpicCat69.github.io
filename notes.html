@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>My Notes</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+    }
+    h1 {
+      color: #00ff99;
+    }
+    ul {
+      list-style-type: square;
+      padding-left: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Private Notes</h1>
+  <ul id="todoList"></ul>
+
+  <script>
+    // Hidden to-do list (edit here to change items)
+    const hiddenProjects = [
+      "AI-powered 3D asset generator",
+      "Procedural space exploration game",
+      "Self-hosted password manager",
+      "Retro-style game engine in C++"
+    ];
+
+    const todoList = document.getElementById("todoList");
+    hiddenProjects.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      todoList.appendChild(li);
+    });
+  </script>
+</body>
+</html>
