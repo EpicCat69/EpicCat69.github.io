@@ -1,100 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Private Notes</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notes</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       background: #111;
       color: #eee;
-      font-family: Arial, sans-serif;
-      max-width: 900px;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background: #222;
+      border-bottom: 2px solid #444;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
       margin: auto;
-      padding: 2rem;
+      padding: 20px;
     }
 
-    h1 {
-      color: #00ff99;
-      font-size: 2.5rem;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    p.subtitle {
-      text-align: center;
-      color: #aaa;
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-    }
-
-    .notes-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
-    }
-
-    .note-card {
-      background: #1a1a1a;
-      padding: 1.2rem;
-      border-radius: 8px;
+    .note {
+      background: #1b1b1b;
       border: 1px solid #333;
-      transition: transform 0.2s, border-color 0.2s;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
     }
 
-    .note-card:hover {
-      transform: translateY(-4px);
-      border-color: #00ff99;
+    .note:hover {
+      transform: scale(1.02);
     }
 
-    .note-card h3 {
+    .note h2 {
       margin-top: 0;
-      color: #00ffcc;
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
+      color: #00d1b2;
+      font-size: 1.4rem;
     }
 
-    .note-card p {
-      color: #ccc;
-      font-size: 0.95rem;
-      line-height: 1.4;
+    .note p {
+      line-height: 1.5;
+      font-size: 1rem;
     }
 
     footer {
       text-align: center;
-      margin-top: 3rem;
-      font-size: 0.8rem;
-      color: #555;
+      padding: 15px;
+      font-size: 0.9rem;
+      background: #222;
+      color: #666;
+      margin-top: 20px;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.6rem;
+      }
+
+      .note h2 {
+        font-size: 1.2rem;
+      }
+
+      .note p {
+        font-size: 0.95rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Private Notes</h1>
-  <p class="subtitle">Stuff I’m planning, building, or just thinking about.</p>
+  <header>
+    <h1>My Hidden Notes</h1>
+  </header>
 
-  <div class="notes-container" id="notesContainer"></div>
+  <div class="container">
+    <div class="note">
+      <h2>Note Title 1</h2>
+      <p>This is the content of the first note. You can add more notes by duplicating this block.</p>
+    </div>
+    <div class="note">
+      <h2>Note Title 2</h2>
+      <p>This is the second note with some more text to show how it wraps on mobile.</p>
+    </div>
+  </div>
 
-  <footer>Last updated: <span id="lastUpdated"></span></footer>
-
-  <script>
-    // Hidden notes data (edit here in GitHub to change items)
-    const hiddenProjects = [
-      { title: "AI-powered 3D Asset Generator", desc: "Tool to create 3D assets automatically using AI-driven procedural generation." },
-      { title: "Procedural Space Exploration Game", desc: "Open-world game with randomly generated planets, ships, and civilizations." },
-      { title: "Self-hosted Password Manager", desc: "Offline-first encrypted password manager with syncing over LAN." },
-      { title: "Retro-Style Game Engine in C++", desc: "Custom 2D game engine inspired by NES/SNES-era limitations." }
-    ];
-
-    // Render cards
-    const container = document.getElementById("notesContainer");
-    hiddenProjects.forEach(project => {
-      const card = document.createElement("div");
-      card.classList.add("note-card");
-      card.innerHTML = `<h3>${project.title}</h3><p>${project.desc}</p>`;
-      container.appendChild(card);
-    });
-
-    // Last updated date
-    document.getElementById("lastUpdated").textContent = new Date().toLocaleDateString();
-  </script>
+  <footer>
+    &copy; 2025 My Secret Notes
+  </footer>
 </body>
 </html>
