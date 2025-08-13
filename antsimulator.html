@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ant Colony Simulation</title>
+<style>
+  :root {
+    --bg: #0f1220;
+    --panel: #171a2b;
+    --accent: #5ee6a8;
+    --muted: #a8b0c0;
+    --warning: #ff7a7a;
+  }
+  html, body {
+    margin: 0; padding: 0; height: 100%; background: var(--bg); color: #e9ecf1;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  }
+  #wrap {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "header header" "panel canvas";
+    height: 100vh;
+    overflow: hidden;
+  }
+  header {
+    grid-area: header;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, #151832, #12162a 45%, #101425);
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #20243a;
+  }
+  header h1 {
+    font-size: 16px; margin: 0; letter-spacing: 0.4px; font-weight: 700;
+  }
+  header .badges {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .badge {
+    font-size: 12px; color: #111; background: var(--accent); padding: 4px 8px; border-radius: 999px; font-weight: 700;
+  }
+  #panel {
+    grid-area: panel;
+    background: var(--panel);
+    border-right: 1px solid #20243a;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  #canvasWrap {
+    grid-area: canvas; position: relative;
+  }
+  canvas { display: block; width: 100%; height: 100%; background: #0c0f1a; }
+  fieldset {
+    border: 1px solid #2a3050; border-radius: 10px; margin: 0 0 14px 0; padding: 12px;
+  }
+  legend { color: var(--muted); padding: 0 8px; }
+  label { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; font-size: 14px; margin: 8px 0; }
+  input[type="range"], input[type="number"] { width: 100%; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button, select {
+    background: #1f2340; color: #e9ecf1; border: 1px solid #2a3050; padding: 8px 10px; border-radius: 8px; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  .mode button.active { outline: 2px solid var(--accent); }
+  .muted { color: var(--muted); }
+  .warning { color: var(--warning); }
+  #stats {
+    font-size: 13px; line-height: 1.4; background: #14182b; border: 1px solid #242a47;
+    padding: 10px; border-radius: 8px; margin-top: 8px;
+  }
+  .legend {
+    display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; margin-top: 6px; font-size: 12px; color: var(--muted);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot.worker { background: #8bd3ff; }
+  .dot.forager { background: #6bf4a3; }
+  .dot.soldier { background: #ffb36b; }
+  .dot.predator { background: #ff6b6b; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .small { font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <h1>Ant Colony Simulation — Canvas</h1>
+    <div class="badges">
+      <span class="badge">Client-side</span>
+      <span class="badge">50+ ants OK</span>
+      <span class="badge">Modular</span>
+    </div>
+  </header>
+
+  <aside id="panel">
+    <fieldset>
+      <legend>Simulation</legend>
+      <div class="row">
+        <button id="toggle">Pause</button>
+        <button id="step">Step</button>
+        <button id="reset">Reset</button>
+      </div>
+      <div class="hint">Left-click canvas to place; hold <b>Shift</b> to remove.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Placement Mode</legend>
+      <div class="row mode" id="modes">
+        <button data-mode="food" class="active">Food</button>
+        <button data-mode="obstacle">Obstacle</button>
+        <button data-mode="ant">Ant</button>
+        <button data-mode="colony">Colony</button>
+        <button data-mode="predator">Predator</button>
+      </div>
+      <div class="hint small">Predator is optional; soldiers will try to intercept.</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Parameters</legend>
+      <label>Ant Count <input id="antCount" type="number" min="1" max="500" value="70"/></label>
+      <label>Speed × <input id="speedMul" type="range" min="0.2" max="3" step="0.1" value="1"/></label>
+      <label>Pheromone Strength <input id="pherStr" type="range" min="0" max="3" step="0.05" value="1.2"/></label>
+      <label>Pheromone Evap/s <input id="pherEvap" type="range" min="0.01" max="0.5" step="0.01" value="0.08"/></label>
+      <label>Food Respawn (/min) <input id="foodRespawn" type="range" min="0" max="60" step="1" value="12"/></label>
+      <label>Trail Following (%)
+        <input id="trailProb" type="range" min="0" max="1" step="0.05" value="0.6"/>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Roles (spawn ratios)</legend>
+      <label>Workers % <input id="pctWorkers" type="range" min="0" max="1" step="0.05" value="0.5"/></label>
+      <label>Foragers % <input id="pctForagers" type="range" min="0" max="1" step="0.05" value="0.4"/></label>
+      <div class="hint small">Soldiers = 1 − workers − foragers</div>
+    </fieldset>
+
+    <section id="stats">
+      <div><b>Stats</b></div>
+      <div id="statsText">—</div>
+      <div class="legend">
+        <span class="dot worker"></span><span>Worker</span>
+        <span class="dot forager"></span><span>Forager</span>
+        <span class="dot soldier"></span><span>Soldier</span>
+        <span class="dot predator"></span><span>Predator</span>
+      </div>
+    </section>
+  </aside>
+
+  <div id="canvasWrap">
+    <canvas id="c"></canvas>
+  </div>
+</div>
+
+<script>
+/* ============ Utilities ============ */
+const rand = (a=0,b=1)=>Math.random()*(b-a)+a;
+const clamp=(v,min,max)=>v<min?min:(v>max?max:v);
+const dist2=(ax,ay,bx,by)=>{const dx=ax-bx, dy=ay-by; return dx*dx+dy*dy;};
+const TAU = Math.PI*2;
+
+/* ============ World Config ============ */
+const CONFIG = {
+  pherGridSize: 120,       // pheromone grid resolution (square)
+  pherEvapPerSec: 0.08,
+  pherDiffuse: 0.15,       // mild blur per tick for smoother trails
+  pherDeposit: 1.2,
+  trailFollowProb: 0.6,
+  baseSpeed: 36,           // px/s nominal
+  turnRate: 3.0,           // radians/s
+  antRadius: 2.2,
+  senseDist: 10,
+  senseAngle: 0.6,         // radians
+  obstacleAvoidanceRadius: 14,
+  foodPickupRadius: 6,
+  predatorSpeed: 46,
+  predatorChaseRadius: 80,
+  soldiersInterceptRadius: 80,
+  foodRespawnPerMin: 12,
+};
+
+const Roles = { WORKER:'worker', FORAGER:'forager', SOLDIER:'soldier' };
+const AntState = { SEARCH:'search', RETURN:'return' };
+
+/* ============ Core Classes ============ */
+class PheromoneGrid {
+  constructor(w,h,cfg){
+    this.cfg = cfg;
+    this.wPix = w; this.hPix = h;
+    this.size = cfg.pherGridSize;
+    this.cellW = w/this.size;
+    this.cellH = h/this.size;
+    this.a = new Float32Array(this.size*this.size);
+  }
+  indexFromXY(x,y){
+    const cx = clamp(Math.floor(x/this.cellW),0,this.size-1);
+    const cy = clamp(Math.floor(y/this.cellH),0,this.size-1);
+    return cy*this.size + cx;
+  }
+  deposit(x,y,amount){
+    const i = this.indexFromXY(x,y);
+    this.a[i] += amount;
+  }
+  sample(x,y){
+    return this.a[this.indexFromXY(x,y)];
+  }
+  step(dt){
+    // Evaporation
+    const evap = Math.pow(1 - this.cfg.pherEvapPerSec, dt); // continuous-ish
+    for(let i=0;i<this.a.length;i++) this.a[i]*=evap;
+    // Light diffusion (Jacobi-ish single pass)
+    const s = this.size;
+    const src = this.a;
+    // To keep it fast, do a sparse diffusion: sample every 2nd cell per frame offset
+    const out = new Float32Array(src); // cheap clone
+    const k = this.cfg.pherDiffuse * dt;
+    for(let y=1;y<s-1;y++){
+      for(let x=1;x<s-1;x++){
+        const i = y*s+x;
+        const n = (src[i-1]+src[i+1]+src[i-s]+src[i+s]) * 0.25;
+        out[i] = src[i]*(1-k) + n*k;
+      }
+    }
+    this.a = out;
+  }
+  draw(ctx){
+    // Heatmap overlay with low alpha for performance
+    const s = this.size;
+    const img = ctx.createImageData(s, s);
+    for(let i=0;i<this.a.length;i++){
+      let v = this.a[i];
+      v = Math.sqrt(clamp(v,0,4)/4); // gentle curve
+      const c = Math.floor(255*v);
+      img.data[i*4+0]=0;
+      img.data[i*4+1]=c;
+      img.data[i*4+2]=80;
+      img.data[i*4+3]=Math.floor(150*v);
+    }
+    // draw scaled
+    ctx.imageSmoothingEnabled = false;
+    ctx.putImageData(img, 0, 0);
+    ctx.drawImage(ctx.canvas, 0,0, s, s, 0,0, this.wPix, this.hPix);
+  }
+}
+
+class Food {
+  constructor(x,y,amount=200){ this.x=x; this.y=y; this.amount=amount; this.r=6; }
+  take(q=1){ const t=Math.min(this.amount,q); this.amount-=t; return t; }
+  get alive(){ return this.amount>0; }
+}
+
+class Obstacle {
+  constructor(x,y,r=16){ this.x=x; this.y=y; this.r=r; }
+  contains(x,y){ return Math.sqrt(dist2(x,y,this.x,this.y))<=this.r; }
+}
+
+class Predator {
+  constructor(x,y){
+    this.x=x; this.y=y; this.dir=rand(0,TAU);
+    this.speed=CONFIG.predatorSpeed;
+    this.cooldown=0;
+  }
+  step(dt, world){
+    // Random walk + chase nearest ant
+    const ants = world.ants;
+    let target=null, tD2=Infinity;
+    for(const a of ants){
+      const d2 = dist2(this.x,this.y,a.x,a.y);
+      if(d2 < tD2 && d2 < CONFIG.predatorChaseRadius*CONFIG.predatorChaseRadius){ tD2=d2; target=a; }
+    }
+    let desiredAngle=this.dir;
+    if(target){
+      desiredAngle = Math.atan2(target.y - this.y, target.x - this.x);
+    } else {
+      desiredAngle += rand(-0.6,0.6)*dt;
+    }
+    // Turn smoothly
+    const diff = ((desiredAngle - this.dir + Math.PI) % TAU) - Math.PI;
+    this.dir += clamp(diff, -3*dt, 3*dt);
+    this.x += Math.cos(this.dir)*this.speed*dt;
+    this.y += Math.sin(this.dir)*this.speed*dt;
+    // World bounds bounce
+    if(this.x<10||this.x>world.w-10) this.dir = Math.PI - this.dir;
+    if(this.y<10||this.y>world.h-10) this.dir = -this.dir;
+    // Eat ants
+    if(this.cooldown>0) this.cooldown-=dt;
+    if(this.cooldown<=0){
+      for(let i=world.ants.length-1;i>=0;i--){
+        const a=world.ants[i];
+        if(dist2(this.x,this.y,a.x,a.y) < 9*9){ // catch
+          world.ants.splice(i,1);
+          world.kills++;
+          this.cooldown=0.6;
+          break;
+        }
+      }
+    }
+  }
+  draw(ctx){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.dir);
+    ctx.fillStyle='#ff6b6b';
+    ctx.beginPath();
+    ctx.moveTo(10,0); ctx.lineTo(-8,6); ctx.lineTo(-8,-6); ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class Ant {
+  constructor(x,y,role=Roles.WORKER, world){
+    this.role = role;
+    this.x=x; this.y=y;
+    this.dir=rand(0,TAU);
+    this.state=AntState.SEARCH;
+    this.carry=0;
+    this.world=world;
+    this.speed = CONFIG.baseSpeed * (role===Roles.SOLDIER?0.9:1);
+    this.color = role===Roles.WORKER?'#8bd3ff': role===Roles.FORAGER?'#6bf4a3':'#ffb36b';
+    this.wiggle = rand(0,1000);
+  }
+  step(dt){
+    const w = this.world;
+    const speed = this.speed * w.params.speedMul;
+    // simple steering
+    let desiredDir = this.dir;
+
+    // Role behaviour modifiers
+    const isSoldier = this.role===Roles.SOLDIER;
+    const isForager = this.role===Roles.FORAGER;
+
+    // State machine
+    if(this.state===AntState.SEARCH){
+      // Follow pheromone trails probabilistically (foragers strongest)
+      const followChance = w.params.trailProb * (isForager?1.2:1.0) * (isSoldier?0.4:1.0);
+      if(Math.random() < followChance){
+        desiredDir = this.sampleGradient();
+      } else {
+        desiredDir += rand(-0.9,0.9)*dt; // random walk
+      }
+
+      // Seek food
+      let nearest=null, nd2=Infinity;
+      for(const f of w.foods){
+        if(!f.alive) continue;
+        const d2 = dist2(this.x,this.y,f.x,f.y);
+        if(d2<nd2){ nd2=d2; nearest=f; }
+      }
+      if(nearest){
+        const angle = Math.atan2(nearest.y - this.y, nearest.x - this.x);
+        desiredDir = this.mixAngles(desiredDir, angle, 0.4);
+        // pick up if close
+        if(nd2 < CONFIG.foodPickupRadius*CONFIG.foodPickupRadius){
+          const q = nearest.take(1);
+          if(q>0){ this.carry += q; this.state=AntState.RETURN; }
+        }
+      }
+
+      // Soldiers intercept predators instead of food
+      if(isSoldier && this.world.predators.length){
+        let p=null, pd2=Infinity;
+        for(const pr of this.world.predators){
+          const d2 = dist2(this.x,this.y,pr.x,pr.y);
+          if(d2<pd2){ pd2=d2; p=pr; }
+        }
+        if(p && pd2 < CONFIG.soldiersInterceptRadius*CONFIG.soldiersInterceptRadius){
+          const a = Math.atan2(p.y - this.y, p.x - this.x);
+          desiredDir = this.mixAngles(desiredDir, a, 0.8);
+        }
+      }
+
+    } else if(this.state===AntState.RETURN){
+      // Head home and deposit pheromone
+      const home = w.colony;
+      const angleHome = Math.atan2(home.y - this.y, home.x - this.x);
+      desiredDir = this.mixAngles(this.dir, angleHome, 0.8);
+      // deposit pheromone proportional to carry
+      w.pher.deposit(this.x, this.y, w.params.pherDeposit * 0.5 * this.carry * dt);
+      if(dist2(this.x,this.y,home.x,home.y) < 16*16){
+        w.totalFood += this.carry;
+        this.carry = 0;
+        this.state = AntState.SEARCH;
+      }
+    }
+
+    // Avoid obstacles
+    for(const o of w.obstacles){
+      const d2o = dist2(this.x,this.y,o.x,o.y);
+      const rr = (o.r+CONFIG.obstacleAvoidanceRadius);
+      if(d2o < rr*rr){
+        const away = Math.atan2(this.y - o.y, this.x - o.x);
+        desiredDir = this.mixAngles(desiredDir, away, 0.9);
+      }
+    }
+
+    // Smooth turning
+    const diff = ((desiredDir - this.dir + Math.PI) % TAU) - Math.PI;
+    this.dir += clamp(diff, -CONFIG.turnRate*dt, CONFIG.turnRate*dt);
+
+    // Move
+    this.x += Math.cos(this.dir)*speed*dt;
+    this.y += Math.sin(this.dir)*speed*dt;
+
+    // Contain to world
+    if(this.x<2) this.x=2, this.dir=0;
+    if(this.y<2) this.y=2, this.dir=TAU/4;
+    if(this.x>this.world.w-2) this.x=this.world.w-2, this.dir=Math.PI;
+    if(this.y>this.world.h-2) this.y=this.world.h-2, this.dir=3*TAU/4;
+  }
+
+  sampleGradient(){
+    // Sample pheromone ahead-left-right and bias toward strongest
+    const g = this.world.pher;
+    const angs = [-CONFIG.senseAngle, 0, CONFIG.senseAngle];
+    let bestAng = this.dir;
+    let bestVal = -1;
+    for(const a of angs){
+      const ang = this.dir + a;
+      const sx = this.x + Math.cos(ang)*CONFIG.senseDist;
+      const sy = this.y + Math.sin(ang)*CONFIG.senseDist;
+      const v = g.sample(sx,sy);
+      if(v>bestVal){ bestVal=v; bestAng=ang; }
+    }
+    return bestAng;
+  }
+
+  mixAngles(a,b,t){
+    const diff = ((b - a + Math.PI) % TAU) - Math.PI;
+    return a + diff*t;
+  }
+
+  draw(ctx){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.dir);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.moveTo(4,0); ctx.lineTo(-3,2); ctx.lineTo(-3,-2); ctx.closePath();
+    ctx.fill();
+    // carry dot
+    if(this.carry>0){
+      ctx.fillStyle='#ffd86b';
+      ctx.beginPath(); ctx.arc(-1,0,1.2,0,TAU); ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+class Colony {
+  constructor(x,y){ this.x=x; this.y=y; }
+  draw(ctx){
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    // mound
+    ctx.fillStyle='#8a6b3d';
+    ctx.beginPath();
+    ctx.arc(0,0,14,0,TAU); ctx.fill();
+    ctx.fillStyle='#b58a52';
+    ctx.beginPath();
+    ctx.arc(0,0,8,0,TAU); ctx.fill();
+    ctx.restore();
+  }
+}
+
+class World {
+  constructor(canvas){
+    this.c = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.w = canvas.width = canvas.clientWidth;
+    this.h = canvas.height = canvas.clientHeight;
+    this.params = {
+      speedMul: 1,
+      pherDeposit: CONFIG.pherDeposit,
+      pherEvap: CONFIG.pherEvapPerSec,
+      trailProb: CONFIG.trailFollowProb,
+      foodRespawnPerMin: CONFIG.foodRespawnPerMin,
+    };
+    this.pher = new PheromoneGrid(this.w,this.h,CONFIG);
+    this.ants = [];
+    this.foods = [];
+    this.obstacles = [];
+    this.predators = [];
+    this.colony = new Colony(this.w*0.5, this.h*0.5);
+    this.totalFood = 0;
+    this.kills = 0;
+    this._accumSpawn = 0;
+  }
+
+  resize(){
+    this.w = this.c.width = this.c.clientWidth;
+    this.h = this.c.height = this.c.clientHeight;
+    this.pher = new PheromoneGrid(this.w,this.h,CONFIG);
+  }
+
+  spawnAnt(role){
+    const jitter = rand(0,TAU);
+    const a = new Ant(this.colony.x + Math.cos(jitter)*rand(0,10), this.colony.y + Math.sin(jitter)*rand(0,10), role, this);
+    this.ants.push(a);
+  }
+  spawnFood(x,y,amount=rand(120,300)){
+    this.foods.push(new Food(x,y, amount));
+  }
+  spawnObstacle(x,y,r=rand(10,24)){
+    this.obstacles.push(new Obstacle(x,y,r));
+  }
+  spawnPredator(x,y){
+    this.predators.push(new Predator(x,y));
+  }
+
+  step(dt){
+    // chance to respawn food per minute
+    const perSec = this.params.foodRespawnPerMin/60;
+    if(Math.random()<perSec*dt){
+      this.spawnFood(rand(20,this.w-20), rand(20,this.h-20));
+    }
+
+    // Update pheromone config (live)
+    this.pher.cfg.pherEvapPerSec = this.params.pherEvap;
+
+    // Ants
+    for(const a of this.ants) a.step(dt);
+    // Pheromone field
+    this.pher.step(dt);
+    // Predators
+    for(const p of this.predators) p.step(dt, this);
+
+    // Cleanup dead foods
+    this.foods = this.foods.filter(f=>f.alive);
+  }
+
+  draw(){
+    const ctx = this.ctx;
+    ctx.clearRect(0,0,this.w,this.h);
+
+    // Draw pheromone heatmap (behind everything)
+    this.pher.draw(ctx);
+
+    // Obstacles
+    for(const o of this.obstacles){
+      ctx.fillStyle='#3a3f5f';
+      ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,TAU); ctx.fill();
+      ctx.strokeStyle='#4b5278'; ctx.stroke();
+    }
+
+    // Food
+    for(const f of this.foods){
+      ctx.fillStyle='#a2ff70';
+      ctx.beginPath(); ctx.arc(f.x,f.y, clamp(3+f.amount*0.02,3,8), 0, TAU); ctx.fill();
+      ctx.strokeStyle='#4ea74a'; ctx.stroke();
+    }
+
+    // Colony
+    this.colony.draw(ctx);
+
+    // Ants
+    for(const a of this.ants) a.draw(ctx);
+
+    // Predators
+    for(const p of this.predators) p.draw(ctx);
+  }
+}
+
+/* ============ Simulation Controller ============ */
+class Simulation {
+  constructor(canvas){
+    this.world = new World(canvas);
+    this.last = performance.now();
+    this.running = true;
+    this.targetAnts = 70;
+    this.roleRatios = { workers: 0.5, foragers: 0.4 }; // soldiers = rest
+    window.addEventListener('resize', ()=>this.world.resize());
+    this.seed();
+    requestAnimationFrame(this.loop.bind(this));
+  }
+
+  seed(){
+    const w=this.world;
+    // colony centered; initial food & obstacles
+    for(let i=0;i<6;i++) w.spawnFood(rand(40,w.w-40), rand(40,w.h-40));
+    for(let i=0;i<8;i++) w.spawnObstacle(rand(30,w.w-30), rand(30,w.h-30), rand(10,22));
+    this.applyAntTarget(true);
+  }
+
+  applyAntTarget(initial=false){
+    const w=this.world;
+    // adjust ants to hit target with role ratios
+    const target = this.targetAnts;
+    // If initial, spawn all fresh; else adjust incrementally
+    if(initial){
+      for(let i=0;i<target;i++) w.spawnAnt(this.pickRole());
+    } else {
+      const diff = target - w.ants.length;
+      if(diff>0){ for(let i=0;i<diff;i++) w.spawnAnt(this.pickRole()); }
+      if(diff<0){ w.ants.splice(0, -diff); }
+    }
+  }
+
+  pickRole(){
+    const r = Math.random();
+    const w=this.roleRatios.workers, f=this.roleRatios.foragers;
+    if(r < w) return Roles.WORKER;
+    if(r < w+f) return Roles.FORAGER;
+    return Roles.SOLDIER;
+  }
+
+  loop(now){
+    const dt = Math.min(0.033, (now - this.last)/1000); // clamp dt
+    this.last = now;
+    if(this.running) this.world.step(dt);
+    this.world.draw();
+    this.renderStats();
+    requestAnimationFrame(this.loop.bind(this));
+  }
+
+  renderStats(){
+    const w=this.world;
+    const avgPher = w.pher.a.reduce((s,v)=>s+v,0)/w.pher.a.length;
+    const text = `
+      Ants: ${w.ants.length}
+      Food sources: ${w.foods.length}
+      Total food delivered: ${w.totalFood}
+      Predators: ${w.predators.length} | Ants eaten: ${w.kills}
+      Avg pheromone: ${avgPher.toFixed(3)}
+    `.replace(/\n\s+/g,'<br/>');
+    document.getElementById('statsText').innerHTML = text;
+  }
+}
+
+/* ============ Boot & UI Wiring ============ */
+const canvas = document.getElementById('c');
+const sim = new Simulation(canvas);
+
+// Placement modes
+let mode = 'food';
+const modesEl = document.getElementById('modes');
+modesEl.addEventListener('click', (e)=>{
+  const b = e.target.closest('button'); if(!b) return;
+  mode = b.dataset.mode;
+  modesEl.querySelectorAll('button').forEach(x=>x.classList.toggle('active', x===b));
+});
+
+function canvasPos(evt){
+  const rect = canvas.getBoundingClientRect();
+  const x = (evt.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (evt.clientY - rect.top) * (canvas.height / rect.height);
+  return {x,y};
+}
+canvas.addEventListener('contextmenu', e=>e.preventDefault());
+
+canvas.addEventListener('mousedown', (e)=>{
+  const {x,y} = canvasPos(e);
+  const removing = e.shiftKey || e.button===2;
+
+  if(removing){
+    // remove nearest object in a small radius
+    const r2=22*22;
+    // foods
+    for(let i=sim.world.foods.length-1;i>=0;i--){
+      const f=sim.world.foods[i];
+      if(dist2(x,y,f.x,f.y)<r2){ sim.world.foods.splice(i,1); return; }
+    }
+    for(let i=sim.world.obstacles.length-1;i>=0;i--){
+      const o=sim.world.obstacles[i];
+      if(dist2(x,y,o.x,o.y)<(o.r+6)*(o.r+6)){ sim.world.obstacles.splice(i,1); return; }
+    }
+    for(let i=sim.world.predators.length-1;i>=0;i--){
+      const p=sim.world.predators[i];
+      if(dist2(x,y,p.x,p.y)<22*22){ sim.world.predators.splice(i,1); return; }
+    }
+    return;
+  }
+
+  switch(mode){
+    case 'food': sim.world.spawnFood(x,y); break;
+    case 'obstacle': sim.world.spawnObstacle(x,y); break;
+    case 'ant': sim.world.spawnAnt(sim.pickRole()); break;
+    case 'colony': sim.world.colony.x=x; sim.world.colony.y=y; break;
+    case 'predator': sim.world.spawnPredator(x,y); break;
+  }
+});
+
+// Controls
+document.getElementById('toggle').addEventListener('click', ()=>{
+  sim.running = !sim.running;
+  document.getElementById('toggle').textContent = sim.running ? 'Pause' : 'Resume';
+});
+document.getElementById('step').addEventListener('click', ()=>{
+  if(sim.running) return;
+  sim.world.step(1/60); sim.world.draw(); sim.renderStats();
+});
+document.getElementById('reset').addEventListener('click', ()=>{
+  const w = sim.world;
+  w.ants=[]; w.foods=[]; w.obstacles=[]; w.predators=[]; w.totalFood=0; w.kills=0;
+  w.colony = new Colony(w.w*0.5, w.h*0.5);
+  sim.applyAntTarget(true);
+});
+
+const antCount = document.getElementById('antCount');
+antCount.addEventListener('change', ()=>{
+  sim.targetAnts = clamp(parseInt(antCount.value||'0',10), 1, 500);
+  antCount.value = sim.targetAnts;
+  sim.applyAntTarget(false);
+});
+document.getElementById('speedMul').addEventListener('input', e=>{
+  sim.world.params.speedMul = parseFloat(e.target.value);
+});
+document.getElementById('pherStr').addEventListener('input', e=>{
+  sim.world.params.pherDeposit = parseFloat(e.target.value);
+});
+document.getElementById('pherEvap').addEventListener('input', e=>{
+  sim.world.params.pherEvap = parseFloat(e.target.value);
+});
+document.getElementById('foodRespawn').addEventListener('input', e=>{
+  sim.world.params.foodRespawnPerMin = parseFloat(e.target.value);
+});
+document.getElementById('trailProb').addEventListener('input', e=>{
+  sim.world.params.trailProb = parseFloat(e.target.value);
+});
+document.getElementById('pctWorkers').addEventListener('input', e=>{
+  const val = parseFloat(e.target.value);
+  sim.roleRatios.workers = clamp(val,0,1);
+});
+document.getElementById('pctForagers').addEventListener('input', e=>{
+  const val = parseFloat(e.target.value);
+  sim.roleRatios.foragers = clamp(val,0,1);
+});
+
+</script>
+</body>
+</html>
