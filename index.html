@@ -208,27 +208,10 @@
   <footer>©️ 2025 SOEP. All rights reserved.</footer>
 
   <script>
-    const tabs = document.querySelectorAll('.tab-button');
-    const sections = document.querySelectorAll('main section');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        sections.forEach(sec => sec.classList.remove('active'));
-        const target = document.getElementById(tab.dataset.tab);
-        target.classList.add('active');
-        if (tab.dataset.tab === 'roadmap') {
-          document.querySelectorAll('.progress').forEach(bar => {
-            bar.style.width = bar.getAttribute('style').match(/width:\s*([\d.]+%)/)[1];
-          });
-        }
-      });
-    });
-
-    // Particle animation
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
     let particles = [];
+    let mouse = { x: null, y: null, radius: 120 };
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -244,8 +227,8 @@
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           r: Math.random() * 2 + 1,
-          dx: (Math.random() - 0.5) * 0.5,
-          dy: (Math.random() - 0.5) * 0.5
+          dx: (Math.random() - 0.5) * 0.7,
+          dy: (Math.random() - 0.5) * 0.7
         });
       }
     }
@@ -258,6 +241,25 @@
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       });
+      drawLines();
+    }
+
+    function drawLines() {
+      for (let a = 0; a < particles.length; a++) {
+        for (let b = a + 1; b < particles.length; b++) {
+          let dx = particles[a].x - particles[b].x;
+          let dy = particles[a].y - particles[b].y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 120) {
+            ctx.strokeStyle = `rgba(0,255,204,${1 - distance / 120})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.stroke();
+          }
+        }
+      }
     }
 
     function updateParticles() {
@@ -266,6 +268,16 @@
         p.y += p.dy;
         if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
         if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+
+        let distX = p.x - mouse.x;
+        let distY = p.y - mouse.y;
+        let distance = Math.sqrt(distX * distX + distY * distY);
+        if (distance < mouse.radius) {
+          let angle = Math.atan2(distY, distX);
+          let force = (mouse.radius - distance) / mouse.radius;
+          p.x += Math.cos(angle) * force * 2;
+          p.y += Math.sin(angle) * force * 2;
+        }
       });
     }
 
@@ -274,6 +286,16 @@
       updateParticles();
       requestAnimationFrame(animate);
     }
+
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mouseout', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
 
     createParticles();
     animate();
