@@ -5,69 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SOEP's Programming Projects</title>
   <style>
+    /* --- GLOBAL STYLES --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a0a0a;
       color: #eee;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      position: relative;
       overflow-x: hidden;
     }
+    a { color: #00ffcc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
-    /* Particle Canvas Styling */
-    #particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: #111;
-    }
-
+    /* --- HEADER --- */
     header {
-      background: rgba(26, 26, 26, 0.7);
-      padding: 2rem;
+      position: relative;
       text-align: center;
-      color: #eee;
-      backdrop-filter: blur(12px); /* Extra blur */
+      padding: 4rem 2rem;
+      overflow: hidden;
     }
-
-    h1 {
-      font-size: 2.5rem;
+    header canvas {
+      position: absolute;
+      inset: 0;
+      filter: blur(20px);
+      opacity: 0.5;
+      z-index: 0;
+    }
+    header h1 {
+      font-size: 3rem;
       margin-bottom: 0.5rem;
-      text-shadow: 0 0 15px rgba(0,255,153,0.5);
-      transition: text-shadow 0.5s ease;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 0 20px rgba(0, 255, 153, 0.8);
+      transition: text-shadow 0.3s ease;
     }
-
-    /* Title glow pulse animation */
-    .glow-pulse {
-      animation: glowPulse 0.8s ease;
+    header h1.glow {
+      text-shadow: 0 0 30px rgba(0, 255, 153, 1);
     }
-    @keyframes glowPulse {
-      0% { text-shadow: 0 0 15px rgba(0,255,153,0.5); }
-      50% { text-shadow: 0 0 30px rgba(0,255,153,1); }
-      100% { text-shadow: 0 0 15px rgba(0,255,153,0.5); }
-    }
-
-    p.tagline {
+    header p.tagline {
       font-size: 1.2rem;
       color: #aaa;
-      margin: 0;
+      position: relative;
+      z-index: 1;
     }
 
+    /* --- TABS --- */
     nav.tabs {
       display: flex;
       justify-content: center;
-      background: rgba(34, 34, 34, 0.85);
-      border-top: 1px solid #333;
-      border-bottom: 1px solid #333;
-      margin: 0;
-      backdrop-filter: blur(4px);
+      background: #111;
+      border-top: 1px solid #222;
+      border-bottom: 1px solid #222;
     }
-
     nav.tabs button {
       background: none;
       border: none;
@@ -75,99 +64,114 @@
       cursor: pointer;
       font-size: 1rem;
       color: #eee;
-      transition: background 0.2s, color 0.2s;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 2;
     }
-
     nav.tabs button:hover {
-      background: rgba(51, 51, 51, 0.6);
+      background: #222;
     }
-
     nav.tabs button.active {
       background: #00ff99;
       color: #000;
       font-weight: bold;
-      box-shadow: 0 0 10px #00ff99;
     }
 
+    /* --- MAIN CONTENT --- */
     main {
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
       padding: 2rem;
-      background: rgba(17, 17, 17, 0.85);
-      backdrop-filter: blur(6px);
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,255,153,0.1);
+      background: rgba(17, 17, 17, 0.9);
+      position: relative;
+      z-index: 1;
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
     }
-
     section {
       display: none;
       opacity: 0;
       transform: translateY(10px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
-
     section.active {
       display: block;
       opacity: 1;
       transform: translateY(0);
     }
-
     h2 {
       border-bottom: 2px solid #444;
       padding-bottom: 0.5rem;
       color: #00ff99;
+      margin-bottom: 1rem;
     }
-
     .project {
-      background: rgba(34, 34, 34, 0.85);
+      background: #1b1b1b;
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1rem;
-      box-shadow: 0 0 10px rgba(0,255,153,0.05);
+    }
+    .project strong {
+      color: #00ff99;
+      font-size: 1.1rem;
     }
 
+    /* --- PROGRESS BARS --- */
+    .progress-wrapper {
+      margin-top: 1rem;
+    }
+    .progress-bar {
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      height: 20px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .progress-bar label {
+      color: #eee;
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+    .progress {
+      height: 100%;
+      background-color: #00ff99;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .progress.zero { background-color: transparent; }
+
+    /* --- FOOTER --- */
     footer {
       text-align: center;
       padding: 1rem;
       font-size: 0.9rem;
       color: #777;
       border-top: 1px solid #333;
-      backdrop-filter: blur(4px);
+      margin-top: 2rem;
     }
 
-    a {
-      color: #00ffcc;
-    }
-
-    ul {
-      list-style-type: square;
-      padding-left: 1.2rem;
-    }
-
+    /* --- RESPONSIVE --- */
     @media (max-width: 768px) {
       h1 { font-size: 2rem; }
       p.tagline { font-size: 1rem; }
       nav.tabs { flex-wrap: wrap; }
-      nav.tabs button {
-        flex: 1 1 100%;
-        padding: 0.8rem 1rem;
-        font-size: 0.95rem;
-      }
-      main { padding: 1.5rem 1rem; }
-      .project { padding: 0.8rem; }
-      h2 { font-size: 1.4rem; }
-      body { font-size: 1rem; }
+      nav.tabs button { flex: 1 1 100%; padding: 0.8rem 1rem; }
     }
   </style>
 </head>
 <body>
-  <canvas id="particles"></canvas>
-  
   <header>
-    <h1 id="title">SOEP's Programming Projects</h1>
+    <canvas id="headerCanvas"></canvas>
+    <h1>SOEP's Programming Projects</h1>
     <p class="tagline">Experiments in AI, utilities, automation, and all things code.</p>
   </header>
 
+  <!-- Tabs -->
   <nav class="tabs">
     <button class="tab-button active" data-tab="about">About Me</button>
     <button class="tab-button" data-tab="experience">Experience</button>
@@ -179,17 +183,15 @@
   <main>
     <section id="about" class="active">
       <h2>About Me</h2>
-      <p>I'm a developer passionate about building tools, systems, and creative solutions...</p>
-      <ul>
-        <li><a href="https://github.com/EpicCat69" target="_blank">GitHub</a></li>
-      </ul>
+      <p>
+        I'm a developer passionate about building tools, systems, and creative solutions across multiple areas of tech...
+      </p>
     </section>
 
     <section id="experience">
       <h2>Experience</h2>
       <ul>
         <li>Languages: C#, Python, C++, HTML, CSS, JavaScript</li>
-        <li>Frameworks & Tools: Unity, .NET, Node.js</li>
       </ul>
     </section>
 
@@ -203,7 +205,17 @@
 
     <section id="roadmap">
       <h2>Roadmap</h2>
-      <p>Enemy AI Toolkit: 70% complete</p>
+      <div class="progress-wrapper">
+        <label>Enemy AI Toolkit: 70%</label>
+        <div class="progress-bar">
+          <div class="progress" style="width: 70%;"></div>
+        </div>
+
+        <label>Short-Form-Content Creator V1: 85%</label>
+        <div class="progress-bar">
+          <div class="progress" style="width: 85%;"></div>
+        </div>
+      </div>
     </section>
 
     <section id="contact">
@@ -212,82 +224,63 @@
     </section>
   </main>
 
+  <footer>
+    &copy; 2025 SOEP
+  </footer>
+
   <script>
-    // Tab switching with glow pulse + fade animation
+    // Tab switching with glow effect
     const tabs = document.querySelectorAll('.tab-button');
     const sections = document.querySelectorAll('main section');
-    const title = document.getElementById('title');
+    const headerTitle = document.querySelector('header h1');
 
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
-        // Animate title glow
-        title.classList.remove('glow-pulse');
-        void title.offsetWidth; // trigger reflow to restart animation
-        title.classList.add('glow-pulse');
-
-        // Fade out current section
         sections.forEach(sec => sec.classList.remove('active'));
-        const target = document.getElementById(tab.dataset.tab);
-        target.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+
+        headerTitle.classList.add('glow');
+        setTimeout(() => headerTitle.classList.remove('glow'), 500);
       });
     });
 
-    // Particle background
-    const canvas = document.getElementById('particles');
+    // Blurred particle animation in header
+    const canvas = document.getElementById('headerCanvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
-    let mouse = { x: null, y: null, radius: 120 };
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height = document.querySelector('header').offsetHeight;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     function createParticles() {
       particles = [];
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 50; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          r: Math.random() * 2 + 1,
-          dx: (Math.random() - 0.5) * 0.7,
-          dy: (Math.random() - 0.5) * 0.7
+          r: Math.random() * 3 + 1,
+          dx: (Math.random() - 0.5) * 0.5,
+          dy: (Math.random() - 0.5) * 0.5
         });
       }
     }
+    createParticles();
 
     function drawParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(0,255,204,0.4)';
+      ctx.fillStyle = 'rgba(0, 255, 153, 0.6)';
       particles.forEach(p => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       });
-      drawLines();
-    }
-
-    function drawLines() {
-      for (let a = 0; a < particles.length; a++) {
-        for (let b = a + 1; b < particles.length; b++) {
-          let dx = particles[a].x - particles[b].x;
-          let dy = particles[a].y - particles[b].y;
-          let distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < 120) {
-            ctx.strokeStyle = `rgba(0,255,204,${0.15 * (1 - distance / 120)})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.stroke();
-          }
-        }
-      }
     }
 
     function updateParticles() {
@@ -296,37 +289,15 @@
         p.y += p.dy;
         if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
         if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-
-        let distX = p.x - mouse.x;
-        let distY = p.y - mouse.y;
-        let distance = Math.sqrt(distX * distX + distY * distY);
-        if (distance < mouse.radius) {
-          let angle = Math.atan2(distY, distX);
-          let force = (mouse.radius - distance) / mouse.radius;
-          p.x += Math.cos(angle) * force * 2;
-          p.y += Math.sin(angle) * force * 2;
-        }
       });
     }
 
-    function animate() {
+    function animateParticles() {
       drawParticles();
       updateParticles();
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animateParticles);
     }
-
-    window.addEventListener('mousemove', e => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-
-    window.addEventListener('mouseout', () => {
-      mouse.x = null;
-      mouse.y = null;
-    });
-
-    createParticles();
-    animate();
+    animateParticles();
   </script>
 </body>
 </html>
