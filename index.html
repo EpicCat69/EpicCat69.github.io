@@ -23,22 +23,33 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1; /* behind everything */
+      z-index: -1;
       background: #111;
     }
 
     header {
-      background: rgba(26, 26, 26, 0.85);
+      background: rgba(26, 26, 26, 0.7);
       padding: 2rem;
       text-align: center;
       color: #eee;
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(12px); /* Extra blur */
     }
 
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
       text-shadow: 0 0 15px rgba(0,255,153,0.5);
+      transition: text-shadow 0.5s ease;
+    }
+
+    /* Title glow pulse animation */
+    .glow-pulse {
+      animation: glowPulse 0.8s ease;
+    }
+    @keyframes glowPulse {
+      0% { text-shadow: 0 0 15px rgba(0,255,153,0.5); }
+      50% { text-shadow: 0 0 30px rgba(0,255,153,1); }
+      100% { text-shadow: 0 0 15px rgba(0,255,153,0.5); }
     }
 
     p.tagline {
@@ -90,10 +101,15 @@
 
     section {
       display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
 
     section.active {
       display: block;
+      opacity: 1;
+      transform: translateY(0);
     }
 
     h2 {
@@ -127,70 +143,20 @@
       list-style-type: square;
       padding-left: 1.2rem;
     }
-    
-    .progress-wrapper {
-      margin-top: 1rem;
-    }
 
-    .progress-bar {
-      background: #333;
-      border-radius: 5px;
-      overflow: hidden;
-      height: 20px;
-      margin-bottom: 10px;
-      position: relative;
-    }
-
-    .progress-bar label {
-      color: #eee;
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      font-size: 0.9rem;
-    }
-
-    .progress {
-      height: 100%;
-      background-color: #00ff99;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    .progress.zero {
-      background-color: transparent;
-    }
     @media (max-width: 768px) {
-      h1 {
-        font-size: 2rem;
-      }
-      p.tagline {
-        font-size: 1rem;
-      }
-      nav.tabs {
-        flex-wrap: wrap;
-      }
+      h1 { font-size: 2rem; }
+      p.tagline { font-size: 1rem; }
+      nav.tabs { flex-wrap: wrap; }
       nav.tabs button {
         flex: 1 1 100%;
         padding: 0.8rem 1rem;
         font-size: 0.95rem;
       }
-      main {
-        padding: 1.5rem 1rem;
-      }
-      .project {
-        padding: 0.8rem;
-      }
-      h2 {
-        font-size: 1.4rem;
-      }
-      body {
-        font-size: 1rem;
-      }
-      .progress-bar label {
-        font-size: 0.8rem;
-      }
+      main { padding: 1.5rem 1rem; }
+      .project { padding: 0.8rem; }
+      h2 { font-size: 1.4rem; }
+      body { font-size: 1rem; }
     }
   </style>
 </head>
@@ -198,11 +164,10 @@
   <canvas id="particles"></canvas>
   
   <header>
-    <h1>SOEP's Programming Projects</h1>
+    <h1 id="title">SOEP's Programming Projects</h1>
     <p class="tagline">Experiments in AI, utilities, automation, and all things code.</p>
   </header>
 
-  <!-- Tabs -->
   <nav class="tabs">
     <button class="tab-button active" data-tab="about">About Me</button>
     <button class="tab-button" data-tab="experience">Experience</button>
@@ -214,9 +179,7 @@
   <main>
     <section id="about" class="active">
       <h2>About Me</h2>
-      <p>
-        I'm a developer passionate about building tools, systems, and creative solutions...
-      </p>
+      <p>I'm a developer passionate about building tools, systems, and creative solutions...</p>
       <ul>
         <li><a href="https://github.com/EpicCat69" target="_blank">GitHub</a></li>
       </ul>
@@ -240,10 +203,7 @@
 
     <section id="roadmap">
       <h2>Roadmap</h2>
-      <div class="progress-wrapper">
-        <label>Enemy AI Toolkit: 70%</label>
-        <div class="progress-bar"><div class="progress" style="width: 70%;"></div></div>
-      </div>
+      <p>Enemy AI Toolkit: 70% complete</p>
     </section>
 
     <section id="contact">
@@ -253,15 +213,25 @@
   </main>
 
   <script>
-    // Tab switching
+    // Tab switching with glow pulse + fade animation
     const tabs = document.querySelectorAll('.tab-button');
     const sections = document.querySelectorAll('main section');
+    const title = document.getElementById('title');
+
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
+
+        // Animate title glow
+        title.classList.remove('glow-pulse');
+        void title.offsetWidth; // trigger reflow to restart animation
+        title.classList.add('glow-pulse');
+
+        // Fade out current section
         sections.forEach(sec => sec.classList.remove('active'));
-        document.getElementById(tab.dataset.tab).classList.add('active');
+        const target = document.getElementById(tab.dataset.tab);
+        target.classList.add('active');
       });
     });
 
