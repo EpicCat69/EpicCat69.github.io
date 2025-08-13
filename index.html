@@ -6,145 +6,203 @@
   <title>SOEP's Programming Projects</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
-      color: #f5f5f5;
+      padding: 0;
+      line-height: 1.6;
+      position: relative;
       overflow-x: hidden;
     }
 
-    /* Particle canvas background */
+    /* Particle Canvas Styling */
     #particles {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* behind everything */
+      background: #111;
     }
-
-    h1, h2 { font-weight: 700; letter-spacing: 1px; }
-    a { color: #00ffcc; text-decoration: none; transition: color 0.3s ease; }
-    a:hover { color: #00ffaa; }
 
     header {
+      background: rgba(26, 26, 26, 0.85);
+      padding: 2rem;
       text-align: center;
-      padding: 3rem 1rem;
-      background: linear-gradient(135deg, rgba(0,255,153,0.1), rgba(0,255,204,0.05));
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 0 30px rgba(0,255,153,0.3);
+      color: #eee;
+      backdrop-filter: blur(6px);
     }
+
     h1 {
-      font-size: 3rem;
-      color: #00ffcc;
-      text-shadow: 0 0 10px rgba(0,255,153,0.5);
-      animation: glowPulse 3s infinite;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 15px rgba(0,255,153,0.5);
     }
-    @keyframes glowPulse {
-      0%, 100% { text-shadow: 0 0 10px rgba(0,255,153,0.5), 0 0 20px rgba(0,255,153,0.3); }
-      50% { text-shadow: 0 0 20px rgba(0,255,153,0.8), 0 0 40px rgba(0,255,153,0.5); }
-    }
+
     p.tagline {
-      color: #ccc;
       font-size: 1.2rem;
-      margin-top: 0.5rem;
-      max-width: 600px;
-      margin-inline: auto;
+      color: #aaa;
+      margin: 0;
     }
 
     nav.tabs {
       display: flex;
       justify-content: center;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(10px);
-      padding: 0.5rem;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    nav.tabs button {
-      background: transparent;
-      border: none;
-      padding: 1rem 1.5rem;
-      font-size: 1rem;
-      color: #eee;
-      cursor: pointer;
-      border-radius: 8px;
-      margin: 0 0.3rem;
-      transition: all 0.3s ease;
-    }
-    nav.tabs button:hover { background: rgba(0,255,153,0.15); }
-    nav.tabs button.active {
-      background: linear-gradient(90deg, #00ffcc, #00ffaa);
-      color: #000;
-      box-shadow: 0 0 20px rgba(0,255,153,0.6);
+      background: rgba(34, 34, 34, 0.85);
+      border-top: 1px solid #333;
+      border-bottom: 1px solid #333;
+      margin: 0;
+      backdrop-filter: blur(4px);
     }
 
-    main { max-width: 900px; margin: auto; padding: 2rem 1rem; }
-    section { display: none; animation: fadeInUp 0.6s ease; }
-    section.active { display: block; }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    nav.tabs button {
+      background: none;
+      border: none;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #eee;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    nav.tabs button:hover {
+      background: rgba(51, 51, 51, 0.6);
+    }
+
+    nav.tabs button.active {
+      background: #00ff99;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 10px #00ff99;
+    }
+
+    main {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+      background: rgba(17, 17, 17, 0.85);
+      backdrop-filter: blur(6px);
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,255,153,0.1);
+    }
+
+    section {
+      display: none;
+    }
+
+    section.active {
+      display: block;
     }
 
     h2 {
-      color: #00ffcc;
-      border-bottom: 2px solid rgba(0,255,153,0.4);
+      border-bottom: 2px solid #444;
       padding-bottom: 0.5rem;
-      margin-bottom: 1rem;
+      color: #00ff99;
     }
 
     .project {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
+      background: rgba(34, 34, 34, 0.85);
       padding: 1rem;
+      border-radius: 8px;
       margin-bottom: 1rem;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .project:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 20px rgba(0,255,153,0.5);
-    }
-
-    .progress-wrapper label {
-      display: block;
-      margin-bottom: 0.3rem;
-      color: #ddd;
-    }
-    .progress-bar {
-      background: rgba(255,255,255,0.1);
-      border-radius: 5px;
-      overflow: hidden;
-      height: 20px;
-      margin-bottom: 10px;
-    }
-    .progress {
-      height: 100%;
-      background: linear-gradient(90deg, #00ffcc, #00ffaa);
-      width: 0%;
-      transition: width 1s ease-out;
+      box-shadow: 0 0 10px rgba(0,255,153,0.05);
     }
 
     footer {
       text-align: center;
       padding: 1rem;
       font-size: 0.9rem;
-      color: #999;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      margin-top: 2rem;
+      color: #777;
+      border-top: 1px solid #333;
+      backdrop-filter: blur(4px);
+    }
+
+    a {
+      color: #00ffcc;
+    }
+
+    ul {
+      list-style-type: square;
+      padding-left: 1.2rem;
+    }
+    
+    .progress-wrapper {
+      margin-top: 1rem;
+    }
+
+    .progress-bar {
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      height: 20px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .progress-bar label {
+      color: #eee;
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: #00ff99;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress.zero {
+      background-color: transparent;
+    }
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      p.tagline {
+        font-size: 1rem;
+      }
+      nav.tabs {
+        flex-wrap: wrap;
+      }
+      nav.tabs button {
+        flex: 1 1 100%;
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+      }
+      main {
+        padding: 1.5rem 1rem;
+      }
+      .project {
+        padding: 0.8rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+      }
+      body {
+        font-size: 1rem;
+      }
+      .progress-bar label {
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
   <canvas id="particles"></canvas>
-
+  
   <header>
     <h1>SOEP's Programming Projects</h1>
     <p class="tagline">Experiments in AI, utilities, automation, and all things code.</p>
   </header>
 
+  <!-- Tabs -->
   <nav class="tabs">
     <button class="tab-button active" data-tab="about">About Me</button>
     <button class="tab-button" data-tab="experience">Experience</button>
@@ -154,60 +212,60 @@
   </nav>
 
   <main>
-    <!-- SAME CONTENT AS BEFORE -->
-    <!-- about -->
     <section id="about" class="active">
       <h2>About Me</h2>
-      <p>I'm a developer passionate about building tools, systems, and creative solutions...</p>
-      <ul><li><a href="https://github.com/EpicCat69" target="_blank">GitHub</a></li></ul>
+      <p>
+        I'm a developer passionate about building tools, systems, and creative solutions...
+      </p>
+      <ul>
+        <li><a href="https://github.com/EpicCat69" target="_blank">GitHub</a></li>
+      </ul>
     </section>
-    <!-- experience -->
+
     <section id="experience">
       <h2>Experience</h2>
       <ul>
         <li>Languages: C#, Python, C++, HTML, CSS, JavaScript</li>
         <li>Frameworks & Tools: Unity, .NET, Node.js</li>
-        <li>Development Tools & Software: Blender, TinkerCAD, Git, Terminal, Docker...</li>
-        <li>Hardware & Platforms: Windows, Arduino, Raspberry Pi</li>
       </ul>
     </section>
-    <!-- projects -->
+
     <section id="projects">
       <h2>Projects</h2>
-      <div class="project"><strong>PhotoFree</strong><p>PhotoFree is a free, browser-based Photoshop alternative...</p></div>
-      <div class="project"><strong>RegexRenamer</strong><p>Bulk rename files in any folder using powerful regex patterns...</p></div>
-      <div class="project"><strong>Filament Roll Manager</strong><p>A simple Python desktop app to manage your 3D printer filament rolls...</p></div>
-      <div class="project"><strong>File Converter</strong><p>A desktop file converter built with Python...</p></div>
-      <div class="project"><strong>Radio System Toolkit</strong><p>A Unity audio system for immersive in-game radio...</p></div>
-      <div class="project"><strong>Enemy AI Toolkit</strong><p>Customizable enemy AI with patrol, chase, and field of view systems...</p></div>
-      <div class="project"><strong>Short-Form-Content Creator V1</strong><p>Create YouTube Shorts/TikToks from a text document...</p></div>
+      <div class="project">
+        <strong>PhotoFree</strong>
+        <p>PhotoFree is a free, browser-based Photoshop alternative...</p>
+      </div>
     </section>
-    <!-- roadmap -->
+
     <section id="roadmap">
       <h2>Roadmap</h2>
       <div class="progress-wrapper">
         <label>Enemy AI Toolkit: 70%</label>
-        <div class="progress-bar"><div class="progress" style="width:70%;"></div></div>
-        <label>Short-Form-Content Creator V1: 85%</label>
-        <div class="progress-bar"><div class="progress" style="width:85%;"></div></div>
-        <label>Radio System Toolkit: 90%</label>
-        <div class="progress-bar"><div class="progress" style="width:90%;"></div></div>
-        <label>Realistic Airplane Controller: 20%</label>
-        <div class="progress-bar"><div class="progress" style="width:20%;"></div></div>
-        <label>NPC AI Toolkit: 0%</label>
-        <div class="progress-bar"><div class="progress" style="width:0%;"></div></div>
+        <div class="progress-bar"><div class="progress" style="width: 70%;"></div></div>
       </div>
     </section>
-    <!-- contact -->
+
     <section id="contact">
       <h2>Contact</h2>
       <p>Email: <a href="mailto:soep0425@gmail.com">soep0425@gmail.com</a></p>
     </section>
   </main>
 
-  <footer>©️ 2025 SOEP. All rights reserved.</footer>
-
   <script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab-button');
+    const sections = document.querySelectorAll('main section');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        sections.forEach(sec => sec.classList.remove('active'));
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Particle background
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -235,7 +293,7 @@
 
     function drawParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#00ffcc';
+      ctx.fillStyle = 'rgba(0,255,204,0.4)';
       particles.forEach(p => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -251,7 +309,7 @@
           let dy = particles[a].y - particles[b].y;
           let distance = Math.sqrt(dx * dx + dy * dy);
           if (distance < 120) {
-            ctx.strokeStyle = `rgba(0,255,204,${1 - distance / 120})`;
+            ctx.strokeStyle = `rgba(0,255,204,${0.15 * (1 - distance / 120)})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(particles[a].x, particles[a].y);
