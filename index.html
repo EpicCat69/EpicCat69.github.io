@@ -16,7 +16,6 @@
       overflow-x: hidden;
     }
 
-    /* Particle Canvas Styling */
     #particles {
       position: fixed;
       top: 0;
@@ -32,7 +31,7 @@
       padding: 2rem;
       text-align: center;
       color: #eee;
-      backdrop-filter: blur(12px); /* Extra blur */
+      backdrop-filter: blur(12px);
     }
 
     h1 {
@@ -42,7 +41,6 @@
       transition: text-shadow 0.5s ease;
     }
 
-    /* Title glow pulse animation */
     .glow-pulse {
       animation: glowPulse 0.8s ease;
     }
@@ -177,19 +175,33 @@
   </nav>
 
   <main>
-    <section id="about" class="active">
+        <section id="about" class="active">
       <h2>About Me</h2>
-      <p>I'm a developer passionate about building tools, systems, and creative solutions...</p>
+      <p>
+        I'm a developer passionate about building tools, systems, and creative solutions across multiple areas of tech. While I started out creating AI and gameplay systems for Unity, my work now extends far beyond that — into general-purpose programming, scripting, automation, and systems design.
+      </p>
+      <p>
+        My focus is always on practical, performance-driven development. Whether it's designing intelligent behaviors for games, building custom dev tools, or automating complex tasks, I enjoy solving real-world problems with code. I work on projects that are modular, expandable, and made to be reused or shared with other developers.
+      </p>
+      <p>
+        In addition to software, I also experiment with hardware, 3D modeling, and fabrication — blending digital systems with the physical world where it makes sense.
+      </p>
+      <p>
+        Here are a few places you can check out more of my work:
+      </p>
       <ul>
-        <li><a href="https://github.com/EpicCat69" target="_blank">GitHub</a></li>
+        <li><a href="https://github.com/EpicCat69" target="_blank" rel="noopener noreferrer">GitHub</a></li>
       </ul>
     </section>
 
     <section id="experience">
       <h2>Experience</h2>
+      <p>Here are some of the programming languages and tools I’m comfortable with:</p>
       <ul>
         <li>Languages: C#, Python, C++, HTML, CSS, JavaScript</li>
         <li>Frameworks & Tools: Unity, .NET, Node.js</li>
+        <li>Development Tools & Software: Blender, TinkerCAD, Git, Terminal, Docker, Visual Studio, Visual Studio Code, Anycubic Slicer Next, Autodesk Fusion</li>
+        <li>Hardware & Platforms: Windows, Arduino, Raspberry Pi</li>
       </ul>
     </section>
 
@@ -197,7 +209,38 @@
       <h2>Projects</h2>
       <div class="project">
         <strong>PhotoFree</strong>
-        <p>PhotoFree is a free, browser-based Photoshop alternative...</p>
+        <p>PhotoFree is a free, browser-based Photoshop alternative in a single HTML file. Draw, paint, add shapes, text, manage layers, import/export images, and more. all offline and without installation.</p>
+        <p><em><a href="https://github.com/EpicCat69/PhotoFree" target="_blank" rel="noopener noreferrer">Click here</a></em></p>
+      </div>
+      <div class="project">
+        <strong>RegexRenamer</strong>
+        <p>Bulk rename files in any folder using powerful regex patterns with live preview. Filter by extension, do dry runs, and undo your last rename. Perfect for devs and creators who want a safe, flexible way to fix filenames without the terminal. Lightweight Python app with Tkinter GUI.</p>
+        <p><em><a href="https://github.com/EpicCat69/RegexRenamer" target="_blank" rel="noopener noreferrer">Click here</a></em></p>
+      </div>
+      <div class="project">
+        <strong>Filament Roll Manager</strong>
+        <p>A simple Python desktop app to manage your 3D printer filament rolls. Track colors, materials, remaining weight, and log filament usage after prints.</p>
+        <p><em><a href="https://github.com/EpicCat69/Filament-Manager" target="_blank" rel="noopener noreferrer">Click here</a></em></p>
+      </div>
+      <div class="project">
+        <strong>File Converter</strong>
+        <p>A desktop file converter built with Python. Supports images, audio, documents, spreadsheets, and text. Includes smart format detection, error handling, and a clean GUI using Tkinter. FFmpeg fallback for audio conversions. Easy to use and extend.</p>
+        <p><em><a href="https://github.com/EpicCat69/File-Converter" target="_blank" rel="noopener noreferrer">Click here</a></em></p>
+      </div>
+      <div class="project">
+        <strong>Radio System Toolkit</strong>
+        <p>A Unity audio system for immersive in-game radio with music, speech, and ads. Includes multi-station support, real-time switching, background playback, and optional UI. Easy to customize and expand. (FREE)</p>
+        <p><em>Soon available on the Unity Asset Store.</em></p>
+      </div>
+      <div class="project">
+        <strong>Enemy AI Toolkit</strong>
+        <p>Customizable enemy AI with patrol, chase, and field of view systems. Built for expandability and performance. ($6.90)</p>
+        <p><em>Soon available on the Unity Asset Store.</em></p>
+      </div>
+      <div class="project">
+        <strong>Short-Form-Content Creator V1</strong>
+        <p>In this project, you can create a YouTube Short using just a text document. By typing the title and body text, you can create addictive TikToks, YouTube Shorts, Instagram Reels, and more, with a background video chosen randomly from a specified folder. Features include TTS, subtitles, random background videos, and even bulk creation using a single text document. (Further explanation can be found in the README after downloading the project.)</p>
+        <p><em>Soon available via GitHub Link.</em></p>
       </div>
     </section>
 
@@ -213,7 +256,6 @@
   </main>
 
   <script>
-    // Tab switching with glow pulse + fade animation
     const tabs = document.querySelectorAll('.tab-button');
     const sections = document.querySelectorAll('main section');
     const title = document.getElementById('title');
@@ -223,19 +265,16 @@
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
-        // Animate title glow
         title.classList.remove('glow-pulse');
-        void title.offsetWidth; // trigger reflow to restart animation
+        void title.offsetWidth;
         title.classList.add('glow-pulse');
 
-        // Fade out current section
         sections.forEach(sec => sec.classList.remove('active'));
         const target = document.getElementById(tab.dataset.tab);
         target.classList.add('active');
       });
     });
 
-    // Particle background
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
     let particles = [];
